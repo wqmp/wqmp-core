@@ -1,3 +1,5 @@
+
+//https://reference.arduino.cc/reference/en/libraries/wifinina/wificlient/
 #include <SPI.h>
 
 #include <WiFi.h>
@@ -9,8 +11,12 @@
 // #include <WiFiUdp.h>
 
 WiFiClient client;
-char ssid[] = "";
-char pass[] = "";
+char ssid[] = ""
+  #include ".env/ssid.txt"
+;
+char pass[] = ""
+  #include ".env/netpass.txt"
+;
 #define ENDL "\r\n"
 
 void setup() {

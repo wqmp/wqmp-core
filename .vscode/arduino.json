@@ -1,0 +1,7 @@
+{
+    "configuration": "mode=on",
+    "board": "arduino:megaavr:uno2018",
+    "port": "COM6",
+    "programmer": "medbg",
+    "sketch": "wqmp-core.ino"
+}

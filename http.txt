@@ -1,0 +1,6 @@
+POST /IKLyZfnXFjUrFXYq HTTP/1.1
+Host: ntfy.sh
+Title: CustomTitle
+Content-Length: 8
+
+It works

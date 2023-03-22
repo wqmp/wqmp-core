@@ -1,0 +1,15 @@
+const waterV = 831.5272727272727, cafeV =  907.395061728395;
+
+function perr(exp: number, ther: number) {
+   return (exp-ther) / ther * 100.0;
+}
+
+const p = 14, v = 1023
+
+function ph(vin: number): number {
+   return (v-vin + 215) / vin * p
+}
+
+console.clear()
+console.log(`Measured Water pH: ${ph(waterV)} (${perr(ph(waterV), 7.0)}% error)`)
+console.log(`Measured Coffee pH: ${ph(cafeV)} (${perr(ph(cafeV), 5.0)}% error)`)

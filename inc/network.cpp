@@ -1,3 +1,4 @@
+//https://reference.arduino.cc/reference/en/libraries/wifinina/wificlient/
 #include <SPI.h>
 #include <WiFi.h>
 

@@ -1,17 +1,11 @@
-
-//https://reference.arduino.cc/reference/en/libraries/wifinina/wificlient/
 #include "inc/env.h"
 #include "inc/network.cpp"
+#include "inc/utils.h"
+#include "inc/pins.h"
 
 #include <SPI.h>
-
 #include <WiFi.h>
-// #include <WiFiClient.h>
-// #include <WiFiNINA.h>
-// #include <WiFiServer.h>
-// #include <WiFiSSLClient.h>
-// #include <WiFiStorage.h>
-// #include <WiFiUdp.h>
+
 
 void setup() {
   Serial.begin(9600);
@@ -37,10 +31,22 @@ void setup() {
     network::HttpHeader {"Priority", "5"}
   );
 
-
-  
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // aMax = 1023.0
+  // vMax = 5.0
+  // vIn = aIn * vMax / aMax
+
+  // See screenshot
+  // pH = vIn * -5.38421052632 + 28.8684210526
+
+  // TBD (in NTU) = -370.8375 * vIn + 1382.5
+  // clamp lower bound to 0
+  
+  // TDS = ?
+  // Fluoro = ?
+  // Flow = ?
+  
+  delay(100);
 }

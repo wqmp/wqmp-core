@@ -1,10 +1,13 @@
-//https://reference.arduino.cc/reference/en/libraries/wifinina/wificlient/
+#ifndef NETWORK_HPP
+#define NETWORK_HPP
+
 #include <SPI.h>
 #include <WiFi.h>
+#include <Arduino.h>
 
 namespace network {
-    WiFiClient client;
-    const String ENDL = "\r\n";
+    /// @brief The line ending used in the HTTP format
+    extern const String ENDL;
 
     /// @brief A struct to represent what is needed to send an HTTP request
     struct HttpRequest {
@@ -22,8 +25,11 @@ namespace network {
         String contentType;
     };
 
+    /// @brief A struct to represent additional HTTP headers
     struct HttpHeader {
+        /// @brief The header name
         String name;
+        /// @brief The header value
         String value;
     };
 
@@ -31,16 +37,31 @@ namespace network {
      * @brief Setup WiFi connection
      * 
      * @param ssid Network name
+     * @return true if connection worked
+     */
+    bool connect(const char* ssid);
+
+    /**
+     * @brief Setup WiFi connection with password
+     * 
+     * @param ssid Network name
      * @param pass Network password
      * @return true if connection worked
      */
-    bool connect(const char* ssid, const char* pass) {
-        return WiFi.begin(ssid, pass) == WL_CONNECTED;
-    }
+    bool connect(const char* ssid, const char* pass);
+
+    /// @brief Sends request and returns true if it worked
+    bool send_http(const HttpRequest request);
+
+    /// @brief Sends request with an additional header and returns true if it worked
+    bool send_http(const HttpRequest request, const HttpHeader header);
 
     namespace {
+        /// @brief Internal WifiClient instance
+        WiFiClient client;
+
         /// @brief Sends request and returns true if it worked
-        bool send_http(HttpRequest request, String extraHeaders) {
+        bool send_http(const HttpRequest request, const String extraHeaders) {
             if(client.connect(request.host.c_str(), request.port)) {
                 String text =
                     request.method + " " + request.route + " HTTP/1.1" + ENDL
@@ -61,40 +82,28 @@ namespace network {
                 return false;
             }        
         }
+
         /// @brief Sends request and returns true if it worked
-        bool send_http(HttpRequest request, String extraHeaders, HttpHeader header) {
+        bool send_http(const HttpRequest request, const String extraHeaders, const HttpHeader header)  {
             return send_http(request, extraHeaders + header.name + ": " + header.value + ENDL);
         }
 
         /// @brief Sends request and returns true if it worked
         template<typename... HttpHeaders>
-        bool send_http(HttpRequest request, String extraHeaders, HttpHeader header, HttpHeaders... args) {
-            extraHeaders += header.name + ": " + header.value + ENDL;
-            return send_http(request, extraHeaders, args...);
+        bool send_http(const HttpRequest request, const String extraHeaders, const HttpHeader header, HttpHeaders... args) {
+            return send_http(request, String(extraHeaders + header.name + ": " + header.value + ENDL), args...);
         }
-    }
-    
-    /// @brief Sends request and returns true if it worked
-    bool send_http(HttpRequest request) {
-        return send_http(request, "");
-    }
-
-    /// @brief Sends request with an additional header and returns true if it worked
-    bool send_http(HttpRequest request, HttpHeader header) {
-        return send_http(request, "", header);
     }
 
     /// @brief Sends request with a variable number of additional headers and returns true if it worked
     template<typename... HttpHeaders>
-    bool send_http(HttpRequest request, HttpHeader header, HttpHeaders... args) {
+    bool send_http(const HttpRequest request, const HttpHeader header, const HttpHeaders... args) {
         String extraHeaders = header.name + ": " + header.value + ENDL;
         return send_http(request, extraHeaders, args...);
     }
 
-    
-
     /// @brief Get a string with WiFi debug information 
-    String get_info() {
-        return String("SSID: ") + WiFi.SSID() + ", IP Address: " + WiFi.localIP() + ", Signal Strength (RSSI): " + WiFi.RSSI() + " dBm";
-    }
+    String get_info();
 }
+
+#endif

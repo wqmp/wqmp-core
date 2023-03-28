@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "vsciot-vscode.vscode-arduino",
+        "streetsidesoftware.code-spell-checker",
+        "cschlosser.doxdocgen",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.vscode-serial-monitor",
+        "ms-vscode.cpptools"
+    ]
+}

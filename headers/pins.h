@@ -3,4 +3,4 @@
 #define PIN_TDS
 // ? for Fluorometer
 // ? for status LED
-#define PIN_FLOW
+#define PIN_FLOW 2

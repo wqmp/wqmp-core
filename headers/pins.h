@@ -1,6 +1,8 @@
 #define PIN_PH A0
 #define PIN_TBD A1
-#define PIN_TDS
+#define PIN_TDS A2
 // ? for Fluorometer
-// ? for status LED
+#define PIN_STATUS_RED 4
+#define PIN_STATUS_GREEN 5
+#define PIN_STATUS_BLUE 6
 #define PIN_FLOW 2

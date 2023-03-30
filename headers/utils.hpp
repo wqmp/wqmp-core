@@ -15,20 +15,29 @@ T average(const size_t size, const T array[]) {
     }
     return sum / size;
 }
+
+/// @brief Sorts an array in place
 template<typename T>
-void swap (T*a, T*b){
-    T t = *a;
-    *a = *b
-    *b = t;
+void sort(const size_t size, T array[]) {
+   for(size_t i = 0; i < size - 1; i++) {
+        size_t mpos = i;
+        for(size_t j = i+1; j < size; j++)
+            if(array[j] < array[mpos])
+                mpos = j;
+        if (mpos != i) {
+            T t = array[mpos];
+            array[mpos] = array[i];
+            array[i] = t;
+        }
+   }
 }
 
-
+/// @brief Takes the median of an array
 template<typename T>
-T median (const size_t size, const T array[]) {
-    T sorted[size] = {0};
-    for(size_t i = 0; i < size; i++) {
-        T min = array[1];
-        for(size_t j = 1; j < size; j++)
-    }
+T median(const size_t size, const T array[]) {
+    T sorted[size];
+    memcpy(sorted, array, size*sizeof(T));
+    sort(size, sorted);
+    return sorted[(size-1)/2];
 }
 #endif

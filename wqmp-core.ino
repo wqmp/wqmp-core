@@ -28,18 +28,49 @@ void setup() {
   }
 
   // Do other one-time setup work
-  network::send_http(
+  bool ok = network::send_http(
     network::HttpRequest {
-      "ntfy.sh", 80, "/IKLyZfnXFjUrFXYq",
+      "ntfy.sh", 80, "/water-alerts-mydevicenumer",
       "POST", "Hello World!", "text/plain"
-    }, 
-    network::HttpHeader {"Title", "Wow!"},
-    network::HttpHeader {"Priority", "5"},
-    network::HttpHeader {"Tags", "unicorn"}
+    }
   );
 }
 
+double get_pH() {
+  int pinvalue = analogRead(PIN_PH);
+  double voltage = a2v(pinvalue);
+  double pH = voltage * -5.38421052632 + 28.8684210526;
+  return pH;
+
+}
+
+int cycles = 0;
 void loop() {
+  cycles++;
+  const int count = 10;
+  double pHValues[count] = {};
+  for(int i = 0; i < count; i++) {
+    pHValues[i] = get_pH();
+    delay(20);
+  }
+  double pH = average(count, pHValues);
+
+  if(pH < 5) {
+    network::send_http(
+      network::HttpRequest {
+        "ntfy.sh", 80, "/water-alerts-mydevicenumer",
+        "POST", "Water quality alert!", "text/plain"
+      }
+    );
+  }
+if(cyles)
+    String message = String("pH=")+pH+";flow=;tds=;";
+network::send_http(
+    network::HttpRequest {
+      "ntfy.sh", 80, "/water-alerts-mydevicenumer",
+      "POST", message, "text/plain"
+    }
+  );
   // Do stuff over and over forever
 
   // aMax = 1023.0

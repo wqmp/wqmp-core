@@ -27,6 +27,11 @@ void setup() {
     return;
   }
 
+  //Setup light pin modes
+  pinMode (PIN_STATUS_RED, OUTPUT);
+  pinMode (PIN_STATUS_GREEN, OUTPUT);
+  pinMode (PIN_STATUS_BLUE, OUTPUT);
+
   // Do other one-time setup work
   bool ok = network::send_http(
     network::HttpRequest {
@@ -41,9 +46,28 @@ double get_pH() {
   double voltage = a2v(pinvalue);
   double pH = voltage * -5.38421052632 + 28.8684210526;
   return pH;
+}
+double get_TBD() {
+  return max (a2v(analogRead(PIN_TBD)) * -370.8375 + 1382.5, 0);
+}
+double get_TDS() {
+  #pragma GCC warn Not Finished
+  return 0;
+}
+double get_fluoro () {
+  #pragma GCC warn Not Finished
+  return 0;
+}
+/// @brief Set status LED color
+/// @param red 0-255 
+/// @param green 0-255
+/// @param blue 0-255
+void set_LED (int red, int green, int blue) {
+  analogWrite (PIN_STATUS_RED, red);
+  analogWrite (PIN_STATUS_GREEN, green);
+  analogWrite (PIN_STATUS_BLUE, blue);
 
 }
-
 int cycles = 0;
 void loop() {
   cycles++;

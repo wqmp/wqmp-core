@@ -11,6 +11,4 @@ https://www.amazon.com/CQRobot-Ocean-Compatible-Scientific-Laboratory/dp/B08KXRH
 https://www.amazon.com/Ultraviolet-Lighting-Electronics-Components-Emitting/dp/B01AUI4W28
 https://www.amazon.com/CQRobot-TCS34725FN-Raspberry-Verification-Classification/dp/B07QLL53CT
 https://www.amazon.com/DIGITEN-Sensor-Effect-Flowmeter-Counter/dp/B07QRZ6Q2B
-RGB LED
-Breadboard
-Breadboard Wires
+https://www.amazon.com/Smraza-Breadboard-Resistors-Mega2560-Raspberry/dp/B01HRR7EBG

@@ -49,23 +49,23 @@ void setup() {
 }
 
 template<typename T, typename F>
-T take_median_reading(const size_t count, F sample, const int delay_ms = 20) {
+T take_reading(const size_t count, F sample, T (*statistic)(size_t, T[]) = (T(*)(size_t, T*)) median<T>, const int delay_ms = 20) {
   T values[count] = {};
   for(size_t i = 0; i < count; i++) {
     values[i] = sample();
     delay(delay_ms);
   }
-  return median(count, values);
+  return statistic(count, values);
 }
 
 /// @brief Do repeated work
 void loop() {
   if(hasCriticalError) return;
 
-  double median_pH = take_median_reading<double>(10, get_pH);
-  double median_TDS = take_median_reading<double>(10, get_TDS);
-  double median_TBD = take_median_reading<double>(10, get_TBD);
-  double median_fluoro = take_median_reading<double>(10, get_fluoro);
+  double median_pH = take_reading<double>(10, get_pH);
+  double median_TDS = take_reading<double>(10, get_TDS);
+  double median_TBD = take_reading<double>(10, get_TBD);
+  double median_fluoro = take_reading<double>(10, get_fluoro);
   
   
   unsigned int flow = flowsensor::get_flow();

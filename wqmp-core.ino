@@ -2,10 +2,21 @@
 #include "headers/pins.h"
 #include "headers/utils.hpp"
 #include "headers/network.hpp"
+#include "headers/io.h"
 
 #include <SPI.h>
 #include <WiFi.h>
 
+#ifndef ENDPOINT_PORT
+#define ENDPOINT_PORT 80
+#endif
+
+#ifndef ALERT_PORT
+#define ALERT_PORT 80
+#endif
+
+
+/// @brief Do one-time setup work
 void setup() {
   // Init Serial Connection (Development only)
   Serial.begin(9600);
@@ -27,74 +38,52 @@ void setup() {
     return;
   }
 
-  //Setup light pin modes
-  pinMode (PIN_STATUS_RED, OUTPUT);
-  pinMode (PIN_STATUS_GREEN, OUTPUT);
-  pinMode (PIN_STATUS_BLUE, OUTPUT);
+  // Setup light pin modes
+  pinMode(PIN_STATUS_RED, OUTPUT);
+  pinMode(PIN_STATUS_GREEN, OUTPUT);
+  pinMode(PIN_STATUS_BLUE, OUTPUT);
 
-  // Do other one-time setup work
-  bool ok = network::send_http(
-    network::HttpRequest {
-      "ntfy.sh", 80, "/water-alerts-mydevicenumer",
-      "POST", "Hello World!", "text/plain"
-    }
-  );
+  flowsensor::setup(PIN_FLOW);
 }
 
-double get_pH() {
-  int pinvalue = analogRead(PIN_PH);
-  double voltage = a2v(pinvalue);
-  double pH = voltage * -5.38421052632 + 28.8684210526;
-  return pH;
+template<typename T>
+T take_reading(const size_t count, T (*sample)(void), T(*statistic)(const size_t size, const T array[]) = median, int delay_ms = 20) {
+  T values[count] = {};
+  for(size_t i = 0; i < count; i++) {
+    values[i] = sample();
+    delay(delay_ms);
+  }
+  return statistic(count, values);
 }
-double get_TBD() {
-  return max (a2v(analogRead(PIN_TBD)) * -370.8375 + 1382.5, 0);
-}
-double get_TDS() {
-  #pragma GCC warn Not Finished
-  return 0;
-}
-double get_fluoro () {
-  #pragma GCC warn Not Finished
-  return 0;
-}
-/// @brief Set status LED color
-/// @param red 0-255 
-/// @param green 0-255
-/// @param blue 0-255
-void set_LED (int red, int green, int blue) {
-  analogWrite (PIN_STATUS_RED, red);
-  analogWrite (PIN_STATUS_GREEN, green);
-  analogWrite (PIN_STATUS_BLUE, blue);
 
-}
-int cycles = 0;
+/// @brief Do repeated work
 void loop() {
-  cycles++;
-  const int count = 10;
-  double pHValues[count] = {};
-  for(int i = 0; i < count; i++) {
-    pHValues[i] = get_pH();
-    delay(20);
-  }
-  double pH = average(count, pHValues);
 
-  if(pH < 5) {
-    network::send_http(
-      network::HttpRequest {
-        "ntfy.sh", 80, "/water-alerts-mydevicenumer",
-        "POST", "Water quality alert!", "text/plain"
-      }
-    );
-  }
-if(cyles)
-    String message = String("pH=")+pH+";flow=;tds=;";
-network::send_http(
-    network::HttpRequest {
-      "ntfy.sh", 80, "/water-alerts-mydevicenumer",
-      "POST", message, "text/plain"
-    }
-  );
+  double median_pH = take_reading<double>(10, get_pH);
+  double median_TDS = take_reading<double>(10, get_TDS);
+  double median_TBD = take_reading<double>(10, get_TBD);
+  double median_fluoro = take_reading<double>(10, get_fluoro);
+  
+  
+  unsigned int flow = flowsensor::get_flow();
+
+
+  // if(pH < 5) {
+  //   network::send_http(
+  //     network::HttpRequest {
+  //       "ntfy.sh", 80, "/water-alerts-mydevicenumer",
+  //       "POST", "Water quality alert!", "text/plain"
+  //     }
+  //   );
+  // }
+// if(cyles)
+//     String message = String("pH=")+pH+";flow=;tds=;";
+//     network::send_http(
+//         network::HttpRequest {
+//           "ntfy.sh", 80, "/water-alerts-mydevicenumer",
+//           "POST", message, "text/plain"
+//         }
+//     );
   // Do stuff over and over forever
 
   // aMax = 1023.0

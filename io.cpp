@@ -25,7 +25,7 @@ double get_fluoro() {
 }
 
 /// @brief Set status LED color
-/// @param red 0-255 
+/// @param red 0-255
 /// @param green 0-255
 /// @param blue 0-255
 void set_LED(int red, int green, int blue) {

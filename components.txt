@@ -1,0 +1,16 @@
+=== Libraries ===
+TCS34725
+WiFiNINA
+
+=== Hardware ===
+https://store-usa.arduino.cc/products/arduino-uno-wifi-rev2?selectedStore=us
+https://www.amazon.com/Arduino-Power-Supply-Adapter-110V/dp/B018OLREG4/
+https://www.amazon.com/Teyleten-Robot-Acquisition-Alkalinity-Monitoring/dp/B09H1MJS4S
+https://www.amazon.com/KEYESTUDIO-Turbidity-Sensor-V1-0-Arduino/dp/B07Q657288
+https://www.amazon.com/CQRobot-Ocean-Compatible-Scientific-Laboratory/dp/B08KXRHK7H
+https://www.amazon.com/Ultraviolet-Lighting-Electronics-Components-Emitting/dp/B01AUI4W28
+https://www.amazon.com/CQRobot-TCS34725FN-Raspberry-Verification-Classification/dp/B07QLL53CT
+https://www.amazon.com/DIGITEN-Sensor-Effect-Flowmeter-Counter/dp/B07QRZ6Q2B
+RGB LED
+Breadboard
+Breadboard Wires

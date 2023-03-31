@@ -2,6 +2,8 @@
 
 #include "headers/pins.h"
 #include "headers/utils.hpp"
+#include "Adafruit_TCS34725.h"
+
 
 #include "Arduino.h"
 
@@ -62,5 +64,24 @@ namespace flowsensor {
     unsigned int mL = L * 1000;
 
     return mL;
+  }
+}
+
+namespace fluorometer {
+  namespace {
+    Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_614MS, TCS34725_GAIN_1X);
+  }
+  bool setup() {
+    return tcs.begin();
+  }
+
+  Color get_color() {
+    Color result;
+    tcs.getRawData(&result.red, &result.green, &result.blue, &result.clear);
+    return result;
+  }
+
+  double get_fluoro() {
+    return 0;
   }
 }

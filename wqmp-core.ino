@@ -1,19 +1,10 @@
-#include "headers/env.h"
-#include "headers/pins.h"
+#include "settings/settings.h"
 #include "headers/utils.hpp"
 #include "headers/network.hpp"
 #include "headers/io.h"
-#include "headers/thresholds.h"
+
 #include <SPI.h>
 #include <WiFi.h>
-
-#ifndef ENDPOINT_PORT
-#define ENDPOINT_PORT 80
-#endif
-
-#ifndef ALERT_PORT
-#define ALERT_PORT 80
-#endif
 
 bool hasCriticalError = false;
 
@@ -58,11 +49,12 @@ T take_reading(const size_t count, F sample, const int delay_ms = 20) {
   return median(count, values);
 }
 
-bool send_alert(String Message = ""){
+bool send_alert(String message = "") {
+  Serial.println("Sending alert!");
   return network::send_http(
     network::HttpRequest {
       ALERT_HOST, ALERT_PORT, ALERT_ROUTE,
-      "POST", Message, "text/plain"
+      "POST", message, "text/plain"
     }
   );
 }
@@ -73,11 +65,10 @@ bool sent_pH_alert = false, sent_TDS_alert = false, sent_TBD_alert = false, sent
 void loop() {
   if(hasCriticalError) return;
 
-  double median_pH = 9.0; //take_reading<double>(10, get_pH);
-
-  double median_TDS = take_reading<double>(10, get_TDS);
-  double median_TBD = take_reading<double>(10, get_TBD);
-  double median_fluoro = take_reading<double>(10, get_fluoro);
+  double median_pH = take_reading<double>(SAMPLE_SIZE, get_pH);
+  double median_TDS = take_reading<double>(SAMPLE_SIZE, get_TDS);
+  double median_TBD = take_reading<double>(SAMPLE_SIZE, get_TBD);
+  double median_fluoro = take_reading<double>(SAMPLE_SIZE, get_fluoro);
   
   
   if(median_pH>SAFE_PH_MAX && !sent_pH_alert) sent_pH_alert = send_alert("pH is too high!");
@@ -87,7 +78,7 @@ void loop() {
   if(median_fluoro>SAFE_FLUORO_MAX && !sent_fluoro_alert) sent_fluoro_alert = send_alert("Fluorescence is too high!");
 
   unsigned long now = millis ();
-  if(now-last_report>= 1000uL*60*30) {
+  if(now-last_report >= 1uL*REPORT_INTERVAL) {
     unsigned int flow = flowsensor::get_flow();
     last_report = now;
     Serial.print ("Report sent");
@@ -99,7 +90,8 @@ void loop() {
       }
     );
   }
-  if(now-last_alert_reset>=1000uL*60*60*12) {
+
+  if(now-last_alert_reset >= 1uL*ALERT_COOLDOWN_INTERVAL) {
     Serial.println("New alert cycle started");
     last_alert_reset = now;
     sent_pH_alert = sent_TDS_alert = sent_TBD_alert = sent_fluoro_alert = false;

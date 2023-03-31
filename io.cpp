@@ -1,6 +1,6 @@
 #include "headers/io.h"
 
-#include "headers/pins.h"
+#include "settings/settings.h"
 #include "headers/utils.hpp"
 
 #include "Arduino.h"
@@ -59,7 +59,7 @@ namespace flowsensor {
     last_read = now;
 
     double L = pulses / FLOW_FREQUENCY * (deltaTs/60.0); // n * (L/min) * min = L
-    unsigned int mL = L * 1000;
+    unsigned int mL = L * 1000u;
 
     return mL;
   }

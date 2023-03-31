@@ -72,7 +72,6 @@ bool sent_pH_alert = false, sent_TDS_alert = false, sent_TBD_alert = false, sent
 /// @brief Do repeated work
 void loop() {
   if(hasCriticalError) return;
-  Serial.println(sent_pH_alert);
 
   double median_pH = 9.0; //take_reading<double>(10, get_pH);
 
@@ -88,61 +87,23 @@ void loop() {
   if(median_fluoro>SAFE_FLUORO_MAX && !sent_fluoro_alert) sent_fluoro_alert = send_alert("Fluorescence is too high!");
 
   unsigned long now = millis ();
-  if(now-last_report>= 1000*60*30||last_report==0){
-  unsigned int flow = flowsensor::get_flow();
+  if(now-last_report>= 1000uL*60*30) {
+    unsigned int flow = flowsensor::get_flow();
     last_report = now;
     Serial.print ("Report sent");
-      String data = String ("")+"ph="+median_pH+";tds="+median_TDS+";tbd="+median_TBD+";fluoro="+median_fluoro+";flow="+flow;
-      network::send_http(
-        network::HttpRequest {
-          ENDPOINT_HOST, ENDPOINT_PORT, ENDPOINT_ROUTE,
-          "POST", data, "text/plain"
-        }
-      );
-    if(now-last_alert_reset>=1000*60*60*12){
-      last_alert_reset = now;
-      sent_pH_alert = sent_TDS_alert = sent_TBD_alert = sent_fluoro_alert = false;
-      
-    }
+    String data = String ("")+"ph="+median_pH+";tds="+median_TDS+";tbd="+median_TBD+";fluoro="+median_fluoro+";flow="+flow;
+    network::send_http(
+      network::HttpRequest {
+        ENDPOINT_HOST, ENDPOINT_PORT, ENDPOINT_ROUTE,
+        "POST", data, "text/plain"
+      }
+    );
   }
-  
-  
+  if(now-last_alert_reset>=1000uL*60*60*12) {
+    Serial.println("New alert cycle started");
+    last_alert_reset = now;
+    sent_pH_alert = sent_TDS_alert = sent_TBD_alert = sent_fluoro_alert = false;
+  }
 
-
-
-  // if(pH < 5) {
-  //   network::send_http(
-  //     network::HttpRequest {
-  //       "ntfy.sh", 80, "/water-alerts-mydevicenumer",
-  //       "POST", "Water quality alert!", "text/plain"
-  //     }
-  //   );
-  // }
-// if(cyles)
-//     String message = String("pH=")+pH+";flow=;tds=;";
-//     network::send_http(
-//         network::HttpRequest {
-//           "ntfy.sh", 80, "/water-alerts-mydevicenumer",
-//           "POST", message, "text/plain"
-//         }
-//     );
-  // Do stuff over and over forever
-
-  // aMax = 1023.0
-  // vMax = 5.0
-  // vIn = aIn * vMax / aMax
-
-  // See screenshot
-  // pH = vIn * -5.38421052632 + 28.8684210526
-
-  // TBD (in NTU) = -370.8375 * vIn + 1382.5
-  // clamp lower bound to 0
-  
-  // TDS = ?
-  // Fluoro = ?
-
-  // https://www.tutorialspoint.com/arduino/arduino_interrupts.htm
-  // Flow = ?
-  
-  delay(100);
+  delay(1000);
 }

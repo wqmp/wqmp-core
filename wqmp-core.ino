@@ -15,7 +15,7 @@
 #define ALERT_PORT 80
 #endif
 
-
+bool hasCriticalError = false;
 /// @brief Do one-time setup work
 void setup() {
   // Init Serial Connection (Development only)
@@ -34,6 +34,7 @@ void setup() {
     Serial.println(network::get_info());
     Serial.println();
   } else {
+    hasCriticalError = true;
     Serial.print("Network connection error");
     return;
   }
@@ -46,23 +47,24 @@ void setup() {
   flowsensor::setup(PIN_FLOW);
 }
 
-template<typename T>
-T take_reading(const size_t count, T (*sample)(void), T(*statistic)(const size_t size, const T array[]) = median, int delay_ms = 20) {
+template<typename T, typename F>
+T take_median_reading(const size_t count, F sample, const int delay_ms = 20) {
   T values[count] = {};
   for(size_t i = 0; i < count; i++) {
     values[i] = sample();
     delay(delay_ms);
   }
-  return statistic(count, values);
+  return median(count, values);
 }
 
 /// @brief Do repeated work
 void loop() {
+  if(hasCriticalError) return;
 
-  double median_pH = take_reading<double>(10, get_pH);
-  double median_TDS = take_reading<double>(10, get_TDS);
-  double median_TBD = take_reading<double>(10, get_TBD);
-  double median_fluoro = take_reading<double>(10, get_fluoro);
+  double median_pH = take_median_reading<double>(10, get_pH);
+  double median_TDS = take_median_reading<double>(10, get_TDS);
+  double median_TBD = take_median_reading<double>(10, get_TBD);
+  double median_fluoro = take_median_reading<double>(10, get_fluoro);
   
   
   unsigned int flow = flowsensor::get_flow();

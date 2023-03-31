@@ -16,8 +16,7 @@ double get_TBD() {
 }
 
 double get_TDS() {
-  #pragma GCC warn Not Finished
-  return 0;
+  return a2v(analogRead(PIN_TDS)) * 8.92857142857;
 }
 
 double get_fluoro() {

@@ -20,4 +20,14 @@ namespace flowsensor {
   unsigned int get_flow();
 }
 
+
+namespace fluorometer {
+  struct Color {
+    unsigned short red, green, blue, clear;
+  };
+  bool setup();
+  Color get_color();
+  double get_fluoro();
+}
+
 #endif

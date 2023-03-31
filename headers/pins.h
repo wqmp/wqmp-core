@@ -6,9 +6,9 @@
 // ? for Fluorometer
 
 // PIN_FLUORO_1 to SDA
-#define PIN_FLUORO_1 A3
+#define PIN_FLUORO_1 A4
 // PIN_FLUORO_2 to SCL
-#define PIN_FLUORO_2 A4
+#define PIN_FLUORO_2 A5
 // LED to GRN
 // UV LED 5V and GND
 

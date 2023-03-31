@@ -5,6 +5,8 @@
 
 #include "Arduino.h"
 
+// Linear Fit: https://www.desmos.com/calculator/29irnoch4x
+
 double get_pH() {
   return a2v(analogRead(PIN_PH)) * -5.38421052632 + 28.8684210526;
 }

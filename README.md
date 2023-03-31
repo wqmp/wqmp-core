@@ -1,2 +1,2 @@
 # wqmp-core
-Create a file `headers/env.h`. Inside, define a macro `NETSSID` with your network name and `NETPASS` with the network password if needed. When running, make sure to select the COM port you have the arduino plugged into. Stop the serial monitor before rerunning or it may not connect without restarting VSCode.
+Create a file `settings/env.h`. Inside, define a macro `NETSSID` with your network name and `NETPASS` with the network password if needed. Define a unique `DEVICE_ID` of 4-16 `A-Z0-9-_` characters. When running, make sure to select the COM port you have the arduino plugged into. Stop the serial monitor before rerunning or it may not connect without restarting VSCode.

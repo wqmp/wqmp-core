@@ -16,6 +16,7 @@
 #endif
 
 bool hasCriticalError = false;
+
 /// @brief Do one-time setup work
 void setup() {
   // Init Serial Connection (Development only)

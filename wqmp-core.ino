@@ -5,6 +5,9 @@
 
 #include <SPI.h>
 #include <WiFi.h>
+#include <Wire.h>
+#include <Adafruit_TCS34725.h>
+
 
 bool hasCriticalError = false;
 
@@ -65,10 +68,10 @@ bool sent_pH_alert = false, sent_TDS_alert = false, sent_TBD_alert = false, sent
 void loop() {
   if(hasCriticalError) return;
 
-  double median_pH = take_reading<double>(SAMPLE_SIZE, get_pH);
-  double median_TDS = take_reading<double>(SAMPLE_SIZE, get_TDS);
-  double median_TBD = take_reading<double>(SAMPLE_SIZE, get_TBD);
-  double median_fluoro = take_reading<double>(SAMPLE_SIZE, get_fluoro);
+  const double median_pH = take_reading<double>(SAMPLE_SIZE, get_pH);
+  const double median_TDS = take_reading<double>(SAMPLE_SIZE, get_TDS);
+  const double median_TBD = take_reading<double>(SAMPLE_SIZE, get_TBD);
+  const double median_fluoro = take_reading<double>(SAMPLE_SIZE, get_fluoro);
   
   
   if(median_pH>SAFE_PH_MAX && !sent_pH_alert) sent_pH_alert = send_alert("pH is too high!");
@@ -77,13 +80,14 @@ void loop() {
   if(median_TBD>SAFE_TBD_MAX && !sent_TBD_alert) sent_TBD_alert = send_alert("TBD is too high!");
   if(median_fluoro>SAFE_FLUORO_MAX && !sent_fluoro_alert) sent_fluoro_alert = send_alert("Fluorescence is too high!");
 
-  unsigned long now = millis ();
-  if(now-last_report >= 1uL*REPORT_INTERVAL) {
-    unsigned int flow = flowsensor::get_flow();
+  const unsigned long now = millis ();
+
+  if(now-last_report >= 1uL*REPORT_INTERVAL || last_report == 0) {
+    const unsigned int flow = flowsensor::get_flow();
     last_report = now;
-    Serial.print ("Report sent");
+    Serial.println("Report sent");
     String data = String ("")+"ph="+median_pH+";tds="+median_TDS+";tbd="+median_TBD+";fluoro="+median_fluoro+";flow="+flow;
-    network::send_http(
+    network::send_https(
       network::HttpRequest {
         ENDPOINT_HOST, ENDPOINT_PORT, ENDPOINT_ROUTE,
         "POST", data, "text/plain"

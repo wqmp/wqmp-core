@@ -56,6 +56,12 @@ namespace network {
     /// @brief Sends request with an additional header and returns true if it worked
     bool send_http(const HttpRequest request, const HttpHeader header);
 
+    /// @brief Sends request and returns true if it worked
+    bool send_https(const HttpRequest request);
+
+    /// @brief Sends request with an additional header and returns true if it worked
+    bool send_https(const HttpRequest request, const HttpHeader header);
+
     namespace {
         /// @brief Internal WifiClient instance
         WiFiClient client;
@@ -93,6 +99,42 @@ namespace network {
         bool send_http(const HttpRequest request, const String extraHeaders, const HttpHeader header, HttpHeaders... args) {
             return send_http(request, String(extraHeaders + header.name + ": " + header.value + ENDL), args...);
         }
+
+        WiFiSSLClient sslClient;
+
+        /// @brief Sends request and returns true if it worked
+        bool send_https(const HttpRequest request, const String extraHeaders) {
+            if(sslClient.connect(request.host.c_str(), request.port)) {
+                String text =
+                    request.method + " " + request.route + " HTTP/1.1" + ENDL
+                    + "Host: " + request.host + ENDL
+                    + "Connection: close" + ENDL
+                    + "User-Agent: Arduino/1.0" + ENDL
+                    + "Content-Type: " + request.contentType + ENDL
+                    + "Content-Length: " + request.content.length() + ENDL
+                    + extraHeaders
+                    + ENDL
+                    + request.content;
+                ;
+
+                sslClient.print(text);
+
+                return true;
+            } else {
+                return false;
+            }        
+        }
+
+        /// @brief Sends request and returns true if it worked
+        bool send_https(const HttpRequest request, const String extraHeaders, const HttpHeader header)  {
+            return send_https(request, extraHeaders + header.name + ": " + header.value + ENDL);
+        }
+
+        /// @brief Sends request and returns true if it worked
+        template<typename... HttpHeaders>
+        bool send_https(const HttpRequest request, const String extraHeaders, const HttpHeader header, HttpHeaders... args) {
+            return send_https(request, String(extraHeaders + header.name + ": " + header.value + ENDL), args...);
+        }
     }
 
     /// @brief Sends request with a variable number of additional headers and returns true if it worked
@@ -100,6 +142,13 @@ namespace network {
     bool send_http(const HttpRequest request, const HttpHeader header, const HttpHeaders... args) {
         String extraHeaders = header.name + ": " + header.value + ENDL;
         return send_http(request, extraHeaders, args...);
+    }
+
+    /// @brief Sends request with a variable number of additional headers and returns true if it worked
+    template<typename... HttpHeaders>
+    bool send_https(const HttpRequest request, const HttpHeader header, const HttpHeaders... args) {
+        String extraHeaders = header.name + ": " + header.value + ENDL;
+        return send_https(request, extraHeaders, args...);
     }
 
     /// @brief Get a string with WiFi debug information 

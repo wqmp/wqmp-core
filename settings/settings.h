@@ -14,7 +14,7 @@
 #endif
 
 #ifndef ENDPOINT_PORT
-#define ENDPOINT_PORT 80
+#define ENDPOINT_PORT 443
 #endif
 
 #ifndef ALERT_HOST

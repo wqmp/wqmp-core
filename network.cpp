@@ -41,6 +41,16 @@ namespace network {
         return send_http(request, "", header);
     }
 
+    /// @brief Sends request and returns true if it worked
+    bool send_https(const HttpRequest request) {
+        return send_https(request, "");
+    }
+
+    /// @brief Sends request with an additional header and returns true if it worked
+    bool send_https(const HttpRequest request, const HttpHeader header) {
+        return send_https(request, "", header);
+    }
+
     /// @brief Get a string with WiFi debug information 
     String get_info() {
         return String("SSID: ") + WiFi.SSID() + ", IP Address: " + WiFi.localIP() + ", Signal Strength (RSSI): " + WiFi.RSSI() + " dBm";

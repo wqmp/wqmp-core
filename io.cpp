@@ -8,18 +8,16 @@
 
 #include "Arduino.h"
 
-// Linear Fit: https://www.desmos.com/calculator/29irnoch4x
-
 double get_pH() {
-  return a2v(analogRead(PIN_PH)) * -5.38421052632 + 28.8684210526;
+  return a2v(analogRead(PIN_PH)) * PH_SLOPE + PH_OFFSET;
 }
 
 double get_TBD() {
-  return max(a2v(analogRead(PIN_TBD)) * -370.8375 + 1382.5, 0);
+  return max(a2v(analogRead(PIN_TBD)) * TBD_SLOPE + TBD_OFFSET, 0);
 }
 
 double get_TDS() {
-  return a2v(analogRead(PIN_TDS)) * 8.92857142857;
+  return a2v(analogRead(PIN_TDS)) * TDS_SLOPE;
 }
 
 /// @brief Set status LED color

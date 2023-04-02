@@ -19,6 +19,11 @@ void setup() {
   Serial.println("Serial is ready");
   Serial.println();
 
+  // Setup light pin modes
+  pinMode(PIN_STATUS_RED, OUTPUT);
+  pinMode(PIN_STATUS_GREEN, OUTPUT);
+  pinMode(PIN_STATUS_BLUE, OUTPUT);
+
   // Init Network Connection
   if(network::connect(NETSSID
 #ifdef NETPASS
@@ -30,16 +35,23 @@ void setup() {
     Serial.println();
   } else {
     hasCriticalError = true;
-    Serial.print("Network connection error");
+    Serial.println("Network connection error");
     return;
   }
 
-  // Setup light pin modes
-  pinMode(PIN_STATUS_RED, OUTPUT);
-  pinMode(PIN_STATUS_GREEN, OUTPUT);
-  pinMode(PIN_STATUS_BLUE, OUTPUT);
+  // Init I2C
+  if(fluorometer::setup()) {
+    Serial.println("I2C is ready");
+    Serial.println();
+  } else {
+    hasCriticalError = true;
+    Serial.println("I2C connection error");
+    return;
+  }
 
   flowsensor::setup(PIN_FLOW);
+
+  set_LED(0,255,0);
 }
 
 template<typename T, typename F>
@@ -54,6 +66,7 @@ T take_reading(const size_t count, F sample, const int delay_ms = 20) {
 
 bool send_alert(String message = "") {
   Serial.println("Sending alert!");
+  set_LED(255, 100, 51);
   return network::send_http(
     network::HttpRequest {
       ALERT_HOST, ALERT_PORT, ALERT_ROUTE,
@@ -66,12 +79,15 @@ bool sent_pH_alert = false, sent_TDS_alert = false, sent_TBD_alert = false, sent
 
 /// @brief Do repeated work
 void loop() {
-  if(hasCriticalError) return;
+  if(hasCriticalError) {
+    set_LED(255,0,0);
+    while(true);
+  }
 
   const double median_pH = take_reading<double>(SAMPLE_SIZE, get_pH);
   const double median_TDS = take_reading<double>(SAMPLE_SIZE, get_TDS);
   const double median_TBD = take_reading<double>(SAMPLE_SIZE, get_TBD);
-  const double median_fluoro = take_reading<double>(SAMPLE_SIZE, get_fluoro);
+  const double median_fluoro = take_reading<double>(SAMPLE_SIZE, fluorometer::get_fluoro);
   
   
   if(median_pH>SAFE_PH_MAX && !sent_pH_alert) sent_pH_alert = send_alert("pH is too high!");
@@ -97,6 +113,7 @@ void loop() {
 
   if(now-last_alert_reset >= 1uL*ALERT_COOLDOWN_INTERVAL) {
     Serial.println("New alert cycle started");
+    set_LED(0,255,0);
     last_alert_reset = now;
     sent_pH_alert = sent_TDS_alert = sent_TBD_alert = sent_fluoro_alert = false;
   }

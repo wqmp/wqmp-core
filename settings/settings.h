@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 #include "env.h"
+#include "calibration.h"
 #include "thresholds.h"
 #include "pins.h"
 

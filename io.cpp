@@ -3,6 +3,9 @@
 #include "settings/settings.h"
 #include "headers/utils.hpp"
 
+#include <Wire.h>
+#include <Adafruit_TCS34725.h>
+
 #include "Arduino.h"
 
 // Linear Fit: https://www.desmos.com/calculator/29irnoch4x
@@ -19,11 +22,6 @@ double get_TDS() {
   return a2v(analogRead(PIN_TDS)) * 8.92857142857;
 }
 
-double get_fluoro() {
-  #pragma GCC warn Not Finished
-  return 0;
-}
-
 /// @brief Set status LED color
 /// @param red 0-255
 /// @param green 0-255
@@ -36,7 +34,6 @@ void set_LED(int red, int green, int blue) {
 
 
 namespace flowsensor {
-  const double FLOW_FREQUENCY = 4.8;// Q (L/min)
   namespace {
     unsigned long last_read;
     volatile int flow_pulses = 0;
@@ -62,5 +59,28 @@ namespace flowsensor {
     unsigned int mL = L * 1000u;
 
     return mL;
+  }
+}
+
+
+
+namespace fluorometer {
+  namespace {
+    Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_614MS, TCS34725_GAIN_1X);
+  }
+  bool setup() {
+    return tcs.begin(FLUORO_I2C);
+  }
+  Color get_color() {
+    Color color;
+    tcs.getRGB(&color.red, &color.green, &color.blue);
+    return color;
+  }
+  double get_fluoro() {
+    Color color = get_color();
+    return
+      (max(0, color.red - FLUORO_STD_RED) + max(0, color.green - FLUORO_STD_GREEN) + max(0, color.blue - FLUORO_STD_BLUE))/
+      ((255 - FLUORO_STD_RED) + (255 - FLUORO_STD_GREEN) + (255 - FLUORO_STD_BLUE))
+    ;
   }
 }

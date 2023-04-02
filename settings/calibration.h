@@ -1,0 +1,7 @@
+// 0-255
+#define FLUORO_STD_RED 62.29
+#define FLUORO_STD_GREEN 38.93
+#define FLUORO_STD_BLUE 165.46
+
+// Q (L/min)
+#define FLOW_FREQUENCY 4.8
